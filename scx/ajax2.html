@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <title>用户注册</title>
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+<div class="container" style="width: 500px;height: 500px;margin-left: auto;">
+<div class="tab-content">
+
+    <div class="row">
+        <div class="col-sm-12 col-md-12" style="text-align: center;margin: 40px auto;"><h2>用户注册</h2></div>
+    </div>
+    <div class="row" id="home">
+        <div class="tab-pane fade in active">
+
+            <strong>邮箱：</strong><br>
+            <input type="text" id="mail" onblur="isMail()" />
+            <span id="mailInfo">请输入正确邮箱</span><br><br>
+            <strong>用户名：</strong><br>
+            <input type="text" id="user" onkeyup="isUser()" />
+            <span id="userInfo">以字母开头，可包含数字、字母、下划线。</span><br><br>
+            <strong>密码：</strong><br>
+            <input type="password" id="pass" onkeyup="isPassword()" />
+            <span id="passInfo">至少8位，必须包含字母、数字</span><br><br>
+            <strong>再次输入密码：</strong><br>
+            <input type="password" id="passw" onkeyup="isPassword1()" />
+            <span id="passInfo1">两次密码输入一致</span><br><br>
+
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class=" btn-group col-sm-12" style="margin-top: 30px;margin-left: 130px">
+        <button type="button" class="btn btn-default active" onclick="register()">完成</button>
+        <a class="" href="#" onclick="Wopen()">已有账号，直接登录</a>
+    </div>
+</div>
+<script>
+
+    function isUser(){
+        var oVal1 = document.getElementById('user');
+        var oSpan1 = document.getElementById('userInfo');
+
+        var reg1=/^[a-zA-Z]\w*$/i;
+        if(oVal1.value && !reg1.test(oVal1.value)){
+            oSpan1.style.display = "inline-block";
+        }else{
+            oSpan1.style.display = "none";
+        }
+    }
+    function isPassword(){
+        var oVal2 = document.getElementById('pass');
+        var oSpan2 = document.getElementById('passInfo');
+        var reg2 = /^([a-zA-z]+[0-9]+)|([0-9]+[a-zA-Z]+)$/i;
+
+        if(oVal2.value.length >= 8 && reg2.test(oVal2.value)){
+            oSpan2.style.display = "none";
+
+        }else{
+            oSpan2.style.display = "inline-block";
+        }
+    }
+    function isPassword1(){
+        var oVal2 = document.getElementById('passw');
+        var oSpan2 = document.getElementById('passInfo1');
+        var reg2 = /^([a-zA-z]+[0-9]+)|([0-9]+[a-zA-Z]+)$/i;
+
+        if(oVal2.value.length >= 8 && reg2.test(oVal2.value)){
+            oSpan2.style.display = "none";
+        }else{
+            oSpan2.style.display = "inline-block";
+        }
+    }
+    function isMail(){
+        var oVal3 = document.getElementById('mail');
+        var oSpan3 = document.getElementById('mailInfo');
+
+        var reg3 = /^([a-zA-Z0-9_-])+\@([a-zA-Z0-9_-])+.([a-zA-Z])+$/;
+        if(oVal3.value && reg3.test(oVal3.value)){
+            oSpan3.style.display = "none";
+
+            $.post('http://manager.zsm-ubuntu.dev/user-exists', {email: mail.value}, function (result) {
+                if (result.code === true) {
+                    alert("该用户已存在");
+                    return mail;
+                } else {
+                    alert("该邮箱可用");
+                }
+            }, 'json')
+
+        }else{
+            oSpan3.style.display = "inline-block";
+        }
+    }
+    function register() {
+        var username = document.getElementById("user").value;
+        var Email = document.getElementById("mail").value;
+        var pass1 = document.getElementById("pass").value;
+        var passw2 = document.getElementById("passw").value;
+        if (username === "" ||  Email === "" || pass1 === "" || passw2 === ""){
+            alert("不能为空");
+            return username;
+        }
+        if(pass1 !== passw2){
+            alert("您输入的新密码与确认密码确认不一致");
+            /* signupForm.passw.focus();*/
+            return false;
+        }
+
+        $.post('http://manager.zsm-ubuntu.dev/register', {email:mail.value,name:user.value,password:pass.value,password_confirmation:passw.value}, function (result) {
+            if (result.code === true) {
+                alert("注册成功");
+                window.location.assign('ajax.html');
+            } else {
+                alert("注册失败");
+
+            }
+        }, 'json')
+
+    }
+
+    function Wopen() {
+        window.location.assign("ajax.html");
+    }
+
+
+</script>
+
+</div>
+
+</body>
+</html>
